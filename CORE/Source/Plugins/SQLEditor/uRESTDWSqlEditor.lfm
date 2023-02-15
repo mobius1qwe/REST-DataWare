@@ -13,7 +13,6 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
   Font.Name = 'Tahoma'
   OnClose = FormClose
   OnCreate = FormCreate
-  OnResize = FormResize
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '2.2.4.0'
@@ -135,9 +134,9 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         Align = alTop
         AutoSize = False
         Caption = ' .: TABLES'
-        Color = clGrayText
+        Color = clBtnShadow
         Font.Color = clWhite
-        Font.Height = -16
+        Font.Height = 24
         Font.Name = 'Segoe UI'
         Layout = tlCenter
         ParentColor = False
@@ -152,7 +151,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         Align = alTop
         AutoSize = False
         Caption = ' .: FIELDS'
-        Color = clGrayText
+        Color = clBtnShadow
         Font.Color = clWhite
         Font.Height = -16
         Font.Name = 'Segoe UI'
@@ -169,7 +168,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         Align = alTop
         AutoSize = False
         Caption = ' .: SQL TYPE'
-        Color = clGrayText
+        Color = clBtnShadow
         Font.Color = clWhite
         Font.Height = -16
         Font.Name = 'Segoe UI'
@@ -280,6 +279,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       Cancel = True
       Caption = 'Cancel'
       ModalResult = 2
+      OnClick = BtnCancelarClick
       TabOrder = 1
     end
   end

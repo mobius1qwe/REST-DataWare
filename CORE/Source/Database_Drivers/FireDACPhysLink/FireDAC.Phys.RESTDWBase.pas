@@ -85,6 +85,8 @@ type
 
     procedure SendMassive(Var Error : Boolean; Var MessageError : String);
     procedure ClearMassive;
+
+    function findRESTDWLink : TFDPhysRDWBaseDriverLink;
   published
     property Database : TRESTDWDatabasebaseBase read FDatabase;
     property MassiveSQL : TRESTDWMassiveSQLCache read FMassiveSQL;
@@ -204,9 +206,14 @@ procedure TFDPhysRDWConnectionBase.findDatabase;
 var
   rdwDriver : TFDPhysRDWBaseDriverLink;
 begin
-  rdwDriver := TFDPhysRDWBaseDriverLink(DriverObj.Manager.FindDriverLink(DriverObj.DriverID));
+  rdwDriver := findRESTDWLink;
   if Assigned(rdwDriver) then
     FDatabase := rdwDriver.Database;
+end;
+
+function TFDPhysRDWConnectionBase.findRESTDWLink: TFDPhysRDWBaseDriverLink;
+begin
+  Result := TFDPhysRDWBaseDriverLink(DriverObj.Manager.FindDriverLink(DriverObj.DriverID));
 end;
 
 procedure TFDPhysRDWConnectionBase.InternalConnect;
@@ -355,6 +362,8 @@ begin
       oRow.SetData(4, null); // INDEX_NAME
       oRow.SetData(5, FInfoMetada.Strings[ARow]); // CONSTRAINT_NAME
       oRow.SetData(6, ARow); // INDEX_TYPE
+      oRow.SetData(7, null); // INDEX_TYPE
+      oRow.SetData(8, null); // INDEX_TYPE
     end
     else if GetMetaInfoKind = mkTables then begin
       sSchema := '';
@@ -373,7 +382,8 @@ begin
         oRow.SetData(2, null); // SCHEMA_NAME
 
       oRow.SetData(3, sTable); // TABLE_NAME
-      oRow.SetData(4, ctTable); // TABLE_TYPE
+      oRow.SetData(4, tkTable); // TABLE_TYPE
+      oRow.SetData(5, osMy); // SCOPE_TYPE
     end
     else if GetMetaInfoKind = mkTableFields then begin
       oRow.SetData(0, ARow); // RECNO
@@ -774,6 +784,8 @@ begin
       {$ENDIF}
     end;
     Result := vString;
+    if Pos(#0,Result) > 0 then
+      Result := StringReplace(Result, #0, '', [rfReplaceAll]);
   end
   // N - Bytes Wide
   else if (FFieldTypes[col] in [dwftWideString,dwftFixedWideChar]) then begin
@@ -792,7 +804,9 @@ begin
          vString := DecodeStrings(vString);
       {$ENDIF}
     end;
-    Result := WideString(vString);
+    Result := vString;
+    if Pos(#0,Result) > 0 then
+      Result := StringReplace(Result, #0, '', [rfReplaceAll]);
   end
   // 1 - Byte - Inteiros
   else if (FFieldTypes[col] in [dwftByte,dwftShortint]) then
@@ -832,8 +846,8 @@ begin
   // 8 - Bytes - Flutuantes
   else if (FFieldTypes[col] in [dwftFloat,dwftExtended]) then
   begin
-    FStream.Read(vInt64, Sizeof(vInt64));
-    Result := vInt64;
+    FStream.Read(vDouble, Sizeof(vDouble));
+    Result := vDouble;
   end
   // 8 - Bytes - Date, Time, DateTime, TimeStamp
   else if (FFieldTypes[col] in [dwftDate,dwftTime,dwftDateTime,dwftTimeStamp]) then
@@ -887,9 +901,12 @@ begin
       try
         vStringStream.CopyFrom(FStream, vInt64);
         vStringStream.Position := 0;
-        Result := TEncoding.Unicode.GetString(vStringStream.Bytes);
+//        Result := TEncoding.Unicode.GetString(vStringStream.Bytes);
+        Result := vStringStream.DataString;
+        if Pos(#0,Result) > 0 then
+          Result := StringReplace(Result, #0, '', [rfReplaceAll]);
       finally
-       vStringStream.Free;
+        vStringStream.Free;
       end;
     end;
   end
@@ -902,8 +919,10 @@ begin
         vStringStream.CopyFrom(FStream, vInt64);
         vStringStream.Position := 0;
         Result := vStringStream.DataString;
+        if Pos(#0,Result) > 0 then
+          Result := StringReplace(Result, #0, '', [rfReplaceAll]);
       finally
-       vStringStream.Free;
+        vStringStream.Free;
       end;
     end;
   end
@@ -924,6 +943,8 @@ begin
       {$ENDIF}
     end;
     Result := vString;
+    if Pos(#0,Result) > 0 then
+      Result := StringReplace(Result, #0, '', [rfReplaceAll]);
   end;
 end;
 

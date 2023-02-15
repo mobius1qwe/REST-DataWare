@@ -4420,18 +4420,17 @@ Var
              StringStream.Size := 0;
             {$ENDIF}
             FreeAndNil(StringStream);
-            If BinaryRequest Then
-             Begin
-              If Pos(TReplyNOK, vDataPack) > 0 Then
-               SetData(vDataPack, Params, ResultData)
-              Else
-               ResultData := vDataPack
-             End
-            Else
-             SetData(vDataPack, Params, ResultData);
+            SetData(vDataPack, Params, ResultData);
            End
           Else
-           SetData(vDataPack, Params, ResultData);
+           Begin
+            SetData(vDataPack, Params, ResultData);
+           End;
+          If (vErrorCode <> 200) Then
+           Begin
+            ErrorMessage := ResultData;
+            ResultData   := TReplyNOK;
+           End;
          End;
        End;
      End;
@@ -4440,6 +4439,7 @@ Var
    case vErrorCode of
      401: ErrorMessage := cInvalidAuth;
      404: ErrorMessage := cEventNotFound;
+     405: ErrorMessage := cInvalidPoolerName;
    end;
   Except
    On E : EIdHTTPProtocolException Do

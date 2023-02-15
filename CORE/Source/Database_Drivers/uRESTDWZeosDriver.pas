@@ -41,6 +41,9 @@ uses
   ZConnection, ZDataset, ZSequence, ZDbcIntfs, ZAbstractRODataset,
   ZAbstractDataset, ZStoredProcedure, ZEncoding, ZDatasetUtils,
   uRESTDWDriverBase, uRESTDWBasicTypes, uRESTDWProtoTypes
+  {$IFNDEF FPC}
+//  , uRESTDWZeosPhysLink
+  {$ENDIF}
   ;
 
 const
@@ -104,9 +107,6 @@ type
 
   TRESTDWZeosDriver = class(TRESTDWDriverBase)
   private
-    {$IFDEF ZEOS80UP}
-      FTransaction : TZTransaction;
-    {$ENDIF}
   protected
     procedure setConnection(AValue: TComponent); override;
 
@@ -141,6 +141,9 @@ implementation
 procedure Register;
 begin
   RegisterComponents('REST Dataware - Drivers', [TRESTDWZeosDriver]);
+  {$IFNDEF FPC}
+//  RegisterComponents('REST Dataware - PhysLink', [TRESTDWZeosPhysLink]);
+  {$ENDIF}
 end;
 
 { TRESTDWZeosStoreProc }
@@ -165,13 +168,6 @@ end;
 
 procedure TRESTDWZeosDriver.setConnection(AValue: TComponent);
 begin
-  {$IFDEF ZEOS80UP}
-    if not TZConnection(AValue).AutoCommit then begin
-      if not Assigned(FTransaction) then
-        FTransaction := TZTransaction.Create(nil);
-      FTransaction.Connection := TZConnection(Connection);
-    end;
-  {$ENDIF}
   inherited setConnection(AValue);
 end;
 
@@ -198,16 +194,12 @@ end;
 
 destructor TRESTDWZeosDriver.Destroy;
 begin
-  {$IFDEF ZEOS80UP}
-    if Assigned(FTransaction) then
-      FreeAndNil(FTransaction);
-  {$ENDIF}
   inherited Destroy;
 end;
 
 Procedure TRESTDWZeosDriver.zAfterPost(DataSet: TDataSet);
 Begin
- TZQuery(DataSet).RefreshCurrentRow(True);
+// TZQuery(DataSet).RefreshCurrentRow(True);
 End;
 
 function TRESTDWZeosDriver.getQuery: TRESTDWDrvQuery;
@@ -216,9 +208,6 @@ var
 begin
   qry := TZQuery.Create(Self);
   qry.Connection := TZConnection(Connection);
-  {$IFDEF ZEOS80UP}
-   qry.Transaction := FTransaction;
-  {$ENDIF}
   {$IFNDEF FPC}
    qry.AfterPost := zAfterPost;
   {$ELSE}
@@ -233,10 +222,6 @@ var
 begin
   qry := TZTable.Create(Self);
   qry.Connection := TZConnection(Connection);
-  {$IFDEF ZEOS80UP}
-    qry.Transaction := FTransaction;
-  {$ENDIF}
-
   Result := TRESTDWZeosTable.Create(qry);
 end;
 
@@ -246,17 +231,13 @@ var
 begin
   qry := TZStoredProc.Create(Self);
   qry.Connection := TZConnection(Connection);
-  {$IFDEF ZEOS80UP}
-    qry.Transaction := FTransaction;
-  {$ENDIF}
-
   Result := TRESTDWZeosStoreProc.Create(qry);
 end;
 
 procedure TRESTDWZeosDriver.Connect;
 begin
   if Assigned(Connection) and (not TZConnection(Connection).Connected) then
-    TZConnection(Connection).Connected := True;
+   TZConnection(Connection).Connected := True;
   inherited Connect;
 end;
 
@@ -278,33 +259,21 @@ function TRESTDWZeosDriver.connInTransaction: boolean;
 begin
   Result := inherited connInTransaction;
   if Assigned(Connection) and (not TZConnection(Connection).AutoCommit) then
-    Result := TZConnection(Connection).InTransaction
-  {$IFDEF ZEOS80UP}
-    else if (Assigned(FTransaction)) then
-      Result := FTransaction.Active;
-  {$ENDIF}
+    Result := TZConnection(Connection).InTransaction;
 end;
 
 procedure TRESTDWZeosDriver.connStartTransaction;
 begin
   inherited connStartTransaction;
   if Assigned(Connection) and (not TZConnection(Connection).AutoCommit) then
-    TZConnection(Connection).StartTransaction
-  {$IFDEF ZEOS80UP}
-    else if (Assigned(FTransaction)) then
-      FTransaction.StartTransaction;
-  {$ENDIF}
+    TZConnection(Connection).StartTransaction;
 end;
 
 procedure TRESTDWZeosDriver.connRollback;
 begin
   inherited connRollback;
   if Assigned(Connection) and (not TZConnection(Connection).AutoCommit) then
-    TZConnection(Connection).Rollback
-  {$IFDEF ZEOS80UP}
-    else if (Assigned(FTransaction)) then
-      FTransaction.Rollback;
-  {$ENDIF}
+    TZConnection(Connection).Rollback;
 end;
 
 function TRESTDWZeosDriver.compConnIsValid(comp: TComponent): boolean;
@@ -315,18 +284,11 @@ end;
 procedure TRESTDWZeosDriver.connCommit;
 begin
   if TZConnection(Connection).AutoCommit then
-    TZConnection(Connection).Commit
-  {$IFDEF ZEOS80UP}
-    else if (Assigned(FTransaction)) then
-      FTransaction.Commit;
-  {$ENDIF}
+    TZConnection(Connection).Commit;
 end;
 
 constructor TRESTDWZeosDriver.Create(AOwner: TComponent);
 begin
-  {$IFDEF ZEOS80UP}
-    FTransaction := nil;
-  {$ENDIF}
   inherited Create(AOwner);
 end;
 

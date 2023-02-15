@@ -1,10 +1,10 @@
 object FrmDWSqlEditor: TFrmDWSqlEditor
   Left = 479
   Top = 236
-  Width = 1079
-  Height = 756
   BorderWidth = 5
   Caption = 'RESTDWClientSQL Editor'
+  ClientHeight = 707
+  ClientWidth = 1053
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,7 +15,6 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
   Position = poScreenCenter
   OnClose = FormClose
   OnCreate = FormCreate
-  OnResize = FormResize
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
@@ -61,7 +60,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         Align = alTop
         AutoSize = False
         Caption = ' .: TABLES'
-        Color = clGrayText
+        Color = clBtnShadow
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWhite
         Font.Height = -16
@@ -80,7 +79,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         Align = alTop
         AutoSize = False
         Caption = ' .: FIELDS'
-        Color = clGrayText
+        Color = clBtnShadow
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWhite
         Font.Height = -16
@@ -99,7 +98,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         Align = alTop
         AutoSize = False
         Caption = ' .: SQL TYPE'
-        Color = clGrayText
+        Color = clBtnShadow
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWhite
         Font.Height = -16
@@ -131,7 +130,6 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
         Height = 121
         Align = alClient
         BorderStyle = bsNone
-        DragMode = dmAutomatic
         ItemHeight = 13
         MultiSelect = True
         TabOrder = 1
@@ -275,6 +273,7 @@ object FrmDWSqlEditor: TFrmDWSqlEditor
       Caption = 'Cancel'
       ModalResult = 2
       TabOrder = 1
+      OnClick = BtnCancelarClick
     end
   end
   object PageControlResult: TPageControl

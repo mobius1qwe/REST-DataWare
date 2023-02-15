@@ -75,13 +75,13 @@ Const
    {$ENDIF}
    procedure FormShow(Sender: TObject);
    procedure FormCreate(Sender: TObject);
-   procedure FormResize(Sender: TObject);
    procedure lbTablesClick(Sender: TObject);
    procedure lbTablesKeyUp(Sender: TObject; var Key: Word;
      Shift: TShiftState);
    procedure MemoDragOver(Sender, Source: TObject; X, Y: Integer;
      State: TDragState; var Accept: Boolean);
    procedure MemoDragDrop(Sender, Source: TObject; X, Y: Integer);
+    procedure BtnCancelarClick(Sender: TObject);
  Private
   { Private declarations }
   DataSource         : TDataSource;
@@ -93,6 +93,7 @@ Const
   Procedure SetFields;
   Function  BuildSQL : String;
   Procedure SetDatabase(Value : TRESTDWDatabasebaseBase);
+  Procedure SetarControles(enab : boolean);
  Public
   { Public declarations }
   Procedure SetClientSQL(Value : TRESTDWClientSQL);
@@ -132,7 +133,6 @@ Begin
  FrmDWSqlEditor := TFrmDWSqlEditor.Create(Application);
  Try
   objObj        := TRESTDWClientSQL(GetComponent(0));
-//  FrmDWSqlEditor.Database := objObj.DataBase;
   FrmDWSqlEditor.SetClientSQL(objObj);
   FrmDWSqlEditor.ShowModal;
   objObj        := Nil;
@@ -144,8 +144,12 @@ End;
 Function TRESTDWSQLEditor.GetAttributes: TPropertyAttributes;
 Begin
  Result := [paDialog, paAutoUpdate];
-// Result := [paDialog, paReadonly];
 End;
+
+procedure TFrmDWSqlEditor.BtnCancelarClick(Sender: TObject);
+begin
+  BtnCancelar.Tag := 1;
+end;
 
 Procedure TFrmDWSqlEditor.BtnExecuteClick(Sender: TObject);
 var
@@ -154,7 +158,7 @@ Begin
  Screen.Cursor := crHourGlass;
  Try
   RESTDWClientSQLB.Close;
-  RESTDWClientSQLB.BinaryRequest        := RESTDWClientSQL.BinaryRequest;
+  RESTDWClientSQLB.BinaryRequest := RESTDWClientSQL.BinaryRequest;
   RESTDWClientSQLB.SQL.Clear;
   RESTDWClientSQLB.SQL.Add(Memo.Lines.Text);
 
@@ -173,25 +177,25 @@ procedure TFrmDWSqlEditor.FormClose(Sender: TObject; var Action: TCloseAction);
 procedure TFrmDWSqlEditor.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 {$ENDIF}
 begin
- If (ModalResult = mrCancel) and (vOldSQL <> Memo.Text) Then
+ If (ModalResult = mrCancel) and (vOldSQL <> Memo.Text) and (BtnCancelar.Tag = 1) Then
  Begin
    {$IFDEF FPC}
     If MessageDlg('SQL Editor', 'Realmente deseja sair ?', mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
      Begin
+      BtnCancelar.Tag := 0;
       CloseAction:=caNone;
       Exit;
      End;
   {$ELSE}
     If MessageDlg('Realmente deseja sair ?', mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
      Begin
+      BtnCancelar.Tag := 0;
       Action:=caNone;
       Exit;
      End;
   {$ENDIF}
  End;
 
-//   RESTDWClientSQL.SQL.Text := vOldSQL
-//   RESTDWClientSQL.SQL.Text := Memo.Text;
  if ModalResult <> mrCancel then
    RESTDWClientSQL.SQL.Assign(Memo.Lines);
 
@@ -208,20 +212,13 @@ begin
  RESTDWClientSQLB := TRESTDWClientSQL.Create(Self);
  DataSource       := TDataSource.Create(Self);
  vLastSelect      := '';
+ SetarControles(False);
 end;
 
 procedure TFrmDWSqlEditor.FormShow(Sender: TObject);
 begin
  DataSource.DataSet        := RESTDWClientSQLB;
  DBGridRecord.DataSource   := DataSource;
- PnlButton.Visible         := False;
- PageControlResult.Visible := PnlButton.Visible;
- If RESTDWClientSQL <> Nil Then
-  Begin
-   PnlButton.Visible         := RESTDWClientSQL.DataBase <> Nil;
-   PageControlResult.Visible := PnlButton.Visible;
-  End;
- pSQLEditor.Visible        := PageControlResult.Visible;
 end;
 
 Procedure TFrmDWSqlEditor.SetFields;
@@ -247,25 +244,35 @@ Begin
   lbFields.Items.Clear;
 End;
 
+procedure TFrmDWSqlEditor.SetarControles(enab: boolean);
+begin
+ PnlButton.Enabled         := enab;
+ PageControlResult.Enabled := enab;
+ pSQLEditor.Enabled        := enab;
+end;
+
 Procedure TFrmDWSqlEditor.SetClientSQL(Value: TRESTDWClientSQL);
 Var
  vMemString : TStringList;
 Begin
  RESTDWClientSQL           := Value;
- vOldSQL                   := RESTDWClientSQL.SQL.Text;
+ vOldSQL                   := '';
  Memo.Lines.Text           := vOldSQL;
  If Assigned(RESTDWClientSQL) Then
   Begin
+   vOldSQL                   := RESTDWClientSQL.SQL.Text;
+   Memo.Lines.Text           := vOldSQL;
    RESTDWDatabase            := RESTDWClientSQL.DataBase;
    RESTDWClientSQLB.DataBase := RESTDWDatabase;
    If RESTDWClientSQL.DataBase <> Nil Then
     Begin
-     vMemString                           := TStringList.Create;
+     vMemString := TStringList.Create;
      Try
       RESTDWDatabase.GetTableNames(vMemString);
-      lbTables.Items.Text                 := vMemString.Text;
+      lbTables.Items.Text := vMemString.Text;
       If lbTables.Count > 0 Then
        Begin
+        SetarControles(True);
         lbTables.ItemIndex                 := 0;
         SetFields;
        End;
@@ -280,14 +287,6 @@ Procedure TFrmDWSqlEditor.SetDatabase(Value : TRESTDWDatabasebaseBase);
 Begin
  RESTDWClientSQLB.DataBase := Value;
 End;
-
-procedure TFrmDWSqlEditor.FormResize(Sender: TObject);
-begin
- PageControl.Top    := 0;
- PageControl.Left   := pSQLEditor.Width;
- PageControl.Height := (Height - PageControlResult.Height) - PnlAction.Height{$IFNDEF FPC} - 48{$ELSE} - 10{$ENDIF};
- PageControl.Width  := Width  - pSQLEditor.Width - PnlButton.Width{$IFNDEF FPC} - 25{$ELSE} - 10{$ENDIF};
-end;
 
 procedure TFrmDWSqlEditor.lbTablesClick(Sender: TObject);
 begin
@@ -338,8 +337,8 @@ Begin
         vFieldsA := vFieldsA + ', ' + lbFields.Items[I];
       End;
      Result := Format(Result, [vFieldsA]);
-    End;
-   If rbInsert.Checked Then
+    End
+   Else If rbInsert.Checked Then
     Begin
      For I := 0 To lbFields.Count -1 Do
       Begin
@@ -355,8 +354,8 @@ Begin
         vFieldsB := vFieldsB + ', :' + lbFields.Items[I];
       End;
      Result := Format(Result, [vFieldsA, vFieldsB]);
-    End;
-   If rbUpdate.Checked Then
+    End
+   Else If rbUpdate.Checked Then
     Begin
      For I := 0 To lbFields.Count -1 Do
       Begin
@@ -372,8 +371,10 @@ Begin
  Else
   Begin
    If rbSelect.Checked Then
-    Result := Format(Result, ['*']);
-   If rbInsert.Checked Then
+    Begin
+     Result := Format(Result, ['*'])
+    End
+   Else If rbInsert.Checked Then
     Begin
      For I := 0 To lbFields.Count -1 Do
       Begin
@@ -387,8 +388,8 @@ Begin
         vFieldsB := vFieldsB + ', :' + lbFields.Items[I];
       End;
      Result := Format(Result, [vFieldsA, vFieldsB]);
-    End;
-   If rbUpdate.Checked Then
+    End
+   Else If rbUpdate.Checked Then
     Begin
      For I := 0 To lbFields.Count -1 Do
       Begin
