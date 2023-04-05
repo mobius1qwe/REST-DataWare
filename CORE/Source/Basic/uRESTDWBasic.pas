@@ -1856,7 +1856,7 @@ Begin
  vAccessTag            := '';
  vErrorMessage         := '';
  vServerMethod         := Nil;
- {$IF Defined(ANDROID) Or Defined(IOS)}
+ {$IF Defined(ANDROID) Or Defined(IOS) or Defined(HAS_FMX)}
  vBasePath             := System.IOUtils.TPath.Combine(System.IOUtils.TPath.GetDocumentsPath, '/');
  {$ELSE}
  vBasePath             := ExtractFilePath(ParamStr(0));

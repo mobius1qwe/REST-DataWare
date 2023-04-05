@@ -51,8 +51,8 @@ body:
   - type: dropdown
     id: version
     attributes:
-      label: "Versão RDW:"
-      description: "Informe a versão do RDW usada."
+      label: "Versão REST DataWare:"
+      description: "Informe a versão do REST DataWare usada."
       options:
         - 2.1.0 (branch)
         - 2.0.8 (trunk)
@@ -65,8 +65,10 @@ body:
       label: "IDE:"
       description: "Informe a IDE usada."
       options:
-        - Delphi novo
-        - Delphi antigo
+        - Delphi 10+
+        - Delphi XE~XE8
+        - Delphi 2006~2010
+        - Delphi 7
         - Lazarus
     validations:
       required: true
