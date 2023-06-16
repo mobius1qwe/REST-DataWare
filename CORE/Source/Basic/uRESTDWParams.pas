@@ -1025,7 +1025,8 @@ End;
 
 Function TJSONValue.FormatValue(bValue : String) : String;
 Var
- aResult    : String;
+ aResult,
+ aPattern   : String;
  vInsertTag : Boolean;
 Begin
  aResult    := bValue;
@@ -1055,7 +1056,7 @@ Begin
  If DataMode = dmDataware Then
   Begin
    If (vTypeObject  = toDataset) Then
-    Result := Format(TValueFormatJSON, ['ObjectType',  GetObjectName(vTypeObject), 'Direction',
+    Result := Format(TValueFormatJSON,      ['ObjectType',  GetObjectName(vTypeObject), 'Direction',
                                              GetDirectionName(vObjectDirection),        'Encoded',
                                              EncodedString, 'ValueType', GetValueType(vObjectValue),
                                              vtagName,      GetValueJSON(aResult)])
@@ -4119,9 +4120,9 @@ Begin
   End
  Else
   Begin
-   {$IFDEF DELPHI2009UP}
+   {$IFDEF DELPHI2010UP}
     vTempValue   := FormatValue(vTempValue);
-   {$ELSE}
+   {$ELSE} // Delphi 2010 pra baixo
     SizeOfString := Length(aValue);
     vTempValue   := '';
     SetString(vTempValue, PChar(@aValue[0]), SizeOfString);
@@ -4132,7 +4133,7 @@ Begin
     vTempValue   := FormatValue(vTempValue);
     If vEncoding = esUtf8 Then
      vTempValue   := Utf8Decode(vTempValue);
-   {$ENDIF} // Delphi 2010 pra cima
+   {$ENDIF}
   End;
  {$ENDIF}
  If Not(Pos('"TAGJSON":}', vTempValue) > 0) Then

@@ -2011,7 +2011,7 @@ Begin
       vRequestHeader.Add(Params.Text);
       vRequestHeader.Add(QueryParams);
       TRESTDWDataUtils.ParseWebFormsParams(Params, Url, QueryParams,
-                                     vmark, vEncoding{$IFDEF FPC}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
+                                     vmark, vEncoding{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
       If DWParams <> Nil Then
        Begin
         If (DWParams.ItemsString['dwwelcomemessage']     <> Nil)    Then
@@ -2164,8 +2164,6 @@ Begin
                sFile := ExtractFileName(Decoder.FileName);
                FreeAndNil(Decoder);
                Decoder := TRESTDWMessageDecoderMIME(NewDecoder);
-//               If Decoder <> Nil Then
-//                TRESTDWMessageDecoderMIME(Decoder).MIMEBoundary := Boundary;
                If Not Assigned(DWParams) Then
                 Begin
                  If (Params.Count = 0) Then
@@ -2174,8 +2172,7 @@ Begin
                    DWParams.Encoding  := vEncoding;
                   End
                  Else
-                  TRESTDWDataUtils.ParseWebFormsParams (Params, Url,
-                                                    QueryParams,
+                  TRESTDWDataUtils.ParseWebFormsParams (Params, Url, QueryParams,
                                                     vmark, vEncoding{$IFDEF RESTDWLAZARUS}, vDatabaseCharSet{$ENDIF}, DWParams, RequestType);
                 End;
                JSONParam    := TJSONParam.Create(DWParams.Encoding);

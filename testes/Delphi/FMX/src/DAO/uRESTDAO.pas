@@ -118,8 +118,12 @@ begin
     FRESTAPI.Execute;
     Result := FRESTAPI.Response.StatusCode = expectedCode;
   except
-    Result := false;
-    erro := Format('Método %s falhou', [currentmethod]);
+    on e: exception do
+    begin
+      Result := false;
+      erro := Format('Método %s falhou, com erro "%s" e status code: "%d"',
+        [currentmethod, e.Message, FRESTAPI.Response.StatusCode]);
+    end;
   end;
 end;
 
