@@ -39,7 +39,6 @@ Var
 Type
  TAddFields = Procedure (All: Boolean) of Object;
 
-Type
  TRESTDWFieldsList = Class(TStringProperty)
  Public
   Function  GetAttributes  : TPropertyAttributes; Override;
@@ -47,13 +46,11 @@ Type
   Procedure Edit;                                 Override;
 End;
 
-Type
  TRESTDWClientRESTList = Class(TComponentProperty)
  Public
   Procedure GetValues(Proc : TGetStrProc);        Override;
 End;
 
-Type
  TPoolersList = Class(TStringProperty)
  Public
   Function  GetAttributes  : TPropertyAttributes; Override;
@@ -61,7 +58,6 @@ Type
   Procedure Edit;                                 Override;
 End;
 
-Type
  TTableList = Class(TStringProperty)
  Public
   Function  GetAttributes  : TPropertyAttributes; Override;
@@ -69,7 +65,6 @@ Type
   Procedure Edit;                                 Override;
 End;
 
-Type
  TPoolersListCDF = Class(TStringProperty)
  Public
   Function  GetAttributes  : TPropertyAttributes; Override;
@@ -77,7 +72,6 @@ Type
   Procedure Edit;                                 Override;
 End;
 
-Type
  TServerEventsList = Class(TStringProperty)
  Public
   Function  GetAttributes  : TPropertyAttributes; Override;
@@ -85,7 +79,6 @@ Type
   Procedure Edit;                                 Override;
 End;
 
-Type
  TServerEventsListCV = Class(TStringProperty)
  Public
   Function  GetAttributes  : TPropertyAttributes; Override;
@@ -93,7 +86,6 @@ Type
   Procedure Edit;                                 Override;
 End;
 
-Type
   TDriverConnectionListProperty = class(TComponentProperty)
   public
     function  GetAttributes: TPropertyAttributes; override;
@@ -101,15 +93,12 @@ Type
     procedure GetValues(Proc: TGetStrProc); override;
   end;
 
-
-type
  TRESTDWServerEventsEditor = Class(TComponentEditor)
   Function  GetVerbCount       : Integer;  Override;
   Function  GetVerb     (Index : Integer): String; Override;
   Procedure ExecuteVerb(Index  : Integer); Override;
 End;
 
-Type
  TRESTDWClientEventsEditor = Class(TComponentEditor)
   Function  GetVerbCount      : Integer;  Override;
   Function  GetVerb    (Index : Integer): String; Override;
@@ -117,7 +106,6 @@ Type
 End;
 
 {$IFNDEF RESTDWLAZARUS}
-Type
  TDSDesignerDW = Class(TDSDesigner)
  Private
  Public
@@ -133,7 +121,6 @@ Type
   Procedure UpdateMenus(Menu: TPopupMenu; EditState: TEditState); Override;
 End;
 
-Type
  TRESTDWClientSQLEditor = Class(TComponentEditor)
  Private
   Procedure EditFields(DataSet: TDataSet);
@@ -146,7 +133,6 @@ Type
 End;
 {$ENDIF}
 
-Type
  TRESTDWServerContextEditor = Class(TComponentEditor)
 Public
  Function  GetVerbCount      : Integer;  Override;
@@ -154,7 +140,6 @@ Public
  Procedure ExecuteVerb(Index : Integer); Override;
 End;
 
-Type
  TRESTDWContextRulesEditor = Class(TComponentEditor)
 Public
  Function  GetVerbCount      : Integer;  Override;
@@ -164,7 +149,6 @@ End;
 
 
 {$IFDEF RESTDWLAZARUS}
-Type
  TRESTDWCGIApplicationDescriptor = Class(TProjectDescriptor)
  Public
   Constructor Create; Override;
@@ -173,18 +157,7 @@ Type
   Function    InitProject     (AProject : TLazProject) : TModalResult; Override;
   Function    CreateStartFiles(AProject : TLazProject) : TModalResult; Override;
  End;
- //TRESTDWCGIDatamodule = Class(TFileDescPascalUnitWithResource)
- //Public
- // Constructor Create; Override;
- // Function    GetInterfaceUsesSection : String; Override;
- // Function    GetInterfaceSource(const Filename, SourceName,
- //                                ResourceName : String) : String; Override;
- // Function    GetLocalizedName        : String; Override;
- // Function    GetLocalizedDescription : String; Override;
- // Function    GetImplementationSource(Const Filename,
- //                                     SourceName,
- //                                     ResourceName : String) : String;Override;
- //End;
+
  TRESTDWDatamodule    = Class(TFileDescPascalUnitWithResource)
  Public
   Constructor Create;Override;
